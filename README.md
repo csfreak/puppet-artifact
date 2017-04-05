@@ -19,20 +19,22 @@ This module is designed to download artifacts using curl, the key feature is the
 
 ## Setup
 
-```puppet module install swizzley88-artifact```
+```puppet module install csfreak-artifact```
 
 ## Paramaeters
 
-  * $source  https://some_url.jar ```[required]```
-  * $target  /some/local/dir ```[required]```
-  * $update  override with newer ```[default: false]```
-  * $rename  rename the downloaded file ```[default: undef]```
-  * $purge   replace the target (alternative to updating) ```[default: false]```
-  * $swap    /download/dir ```[default: /tmp]```
-  * $timeout exit after $x seconds ```[default: 0]```
-  * $owner   uid owner of file ```[default: undef]```
-  * $group   gid owner of file ```[default: undef]```
-  * $mode    default permissions mode of file ```[default: undef]```
+  * $source   https://some_url.jar ```[required]```
+  * $target   /some/local/dir ```[required]```
+  * $update   override with newer ```[default: false]```
+  * $rename   rename the downloaded file ```[default: undef]```
+  * $purge    replace the target (alternative to updating) ```[default: false]```
+  * $swap     /download/dir ```[default: /tmp]```
+  * $timeout  exit after $x seconds ```[default: 0]```
+  * $owner    uid owner of file ```[default: undef]```
+  * $group    gid owner of file ```[default: undef]```
+  * $mode     default permissions mode of file ```[default: undef]```
+  * $validate default method to validate file ```[default: size]```
+  * $modified     Prevent replacement loops if puppet modifies this file ```[default: false]```
 
 ## Usage
 
@@ -63,15 +65,14 @@ artifact { "artifact-${version}-${build}.war":
 Command-Line usage of /usr/local/sbin/artifact-puppet:
 
 ```
-/usr/local/sbin/artifact-puppet /opt/wordpress.tar.gz https://wordpress.org/latest.tar.gz /tmp/wordpress.tar.gz
+/usr/local/sbin/artifact-puppet /opt/wordpress.tar.gz https://wordpress.org/latest.tar.gz /tmp/wordpress.tar.gz size false
 ```
 
-This will only compare if ARG1's size isn't the same as ARG2 and download it to ARG3, it only touches ARG1 & ARG3 if they don't exist.
 
 ## Requirements
 
 ```
-package { ['curl', 'diffutils', 'grep', 'dos2unix']: ensure => 'installed' }
+package { ['curl', 'diffutils', 'grep', 'dos2unix', 'md5sum']: ensure => 'installed' }
 ```
 
 ## Compatibility
@@ -81,21 +82,13 @@ Linux:
  * RHEL/CentOS/Fedora/Oracle/Scientific
  * Debian/Ubuntu
  
-Tested On: CentOS 6, Ubuntu 14.04
+Tested On: CentOS 7
 
 ## Limitations
 
-Comparison operations are limited to diff for version <= 0.1.x, and to file size as of >= 0.2.x <= 0.3.0
+ * To preform md5sum,  remote file must have md5 available at the same url with an aditional .md5
 
-**WARNING**: As of  >= 0.2.8 File permissions are declared in this module, so the users declaring those permissions externally should use version <= 0.1.4
+## Source
 
-**WARNING**: Resume functionality in 0.2.6 can lead to corruption for artifacts that change before an interrupted download resumes, resume now deprecated as of >= 0.2.7
-
-**WARNING**: As of >=0.3.0 the legacy update parameter has been deprecated, if using ```legacy => ``` anywhere, stick to version >= 0.2.0 <= 0.2.8
-
-## Development
-
-  * Add support for checksum params
-  * Perhaps add additional OS support
-
+  * All versions before 0.4 forked from https://github.com/swizzley/puppet-artifact
 
